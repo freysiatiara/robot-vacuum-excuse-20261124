@@ -12,15 +12,24 @@ LINE = (
 )
 
 
-def main() -> None:
-    if not 1 <= len(LINE) <= 140:
+def validate(line: str) -> None:
+    """Guard the gate before writing: one line, 1..140 chars, no control chars."""
+    if not 1 <= len(line) <= 140:
         raise SystemExit(
-            "entry must be 1..140 characters, got %d" % len(LINE)
+            "entry must be 1..140 characters, got %d" % len(line)
         )
-    if not LINE.strip():
+    if not line.strip():
         raise SystemExit("entry must not be only whitespace")
-    if "\n" in LINE or "\r" in LINE:
+    if "\n" in line or "\r" in line:
         raise SystemExit("entry must be a single line, no newline characters")
+    if line != line.strip():
+        raise SystemExit("entry must not have leading or trailing whitespace")
+    if any(ord(ch) < 32 or ord(ch) == 127 for ch in line):
+        raise SystemExit("entry must not contain control characters")
+
+
+def main() -> None:
+    validate(LINE)
 
     out_path = os.environ.get("ENTRY_OUTPUT", "/output/entry.txt")
     parent = os.path.dirname(out_path)
